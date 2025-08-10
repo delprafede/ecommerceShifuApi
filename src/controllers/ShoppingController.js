@@ -82,90 +82,93 @@ async function GetShopingByIdUsu(req, res) {
 
 //CREA - AGREGA PRODUCTOS - MODIFICA LA CANTIDAD DE UN PRODUCTO EN UN CARRITO PARA UN USUARIO (FUNCIONANDO)
 async function PostProduct(req, res) {
-  try {
-    const { IdProduct, IdUsu, cantidad, color, eid } = req.body;
-    console.log(req.body);
-    const Cart = await Shoppings.findOne({ IdUsu: IdUsu });
+ const {productLocal, IdUsu} = req.body;
+ console.log(productLocal)
+ const{IdProduct, cantidad, color, eid} = productLocal
+ console.log(cantidad)
+  //   const { IdProduct, IdUsu, cantidad, color, eid } = req.body;
+  //   console.log(req.body, "soy");
+  //   const Cart = await Shoppings.findOne({ IdUsu: IdUsu });
 
-    const Product = await SchemaProduct.findOne({ IdProduct: IdProduct });
+  //   const Product = await SchemaProduct.findOne({ IdProduct: IdProduct });
 
-    const Especi = await Especificaciones.findById(eid);
-    const pid = Product._id;
-    const IdArtCarro = Especi.CodArt;
-    // console.log(Especi);
-    // CONSULTO SI EL STOCK ES SUFICIENTE PARA LA CANTIDAD INGRESADA
-    if (Especi.Stock >= cantidad) {
-      // STOCK SUFICIENTE
-      const IdProductCarro = IdProduct;
+  //   const Especi = await Especificaciones.findById(eid);
+  //   const pid = Product._id;
+  //   const IdArtCarro = Especi.CodArt;
+  //   // console.log(Especi);
+  //   // CONSULTO SI EL STOCK ES SUFICIENTE PARA LA CANTIDAD INGRESADA
+  //   if (Especi.Stock >= cantidad) {
+  //     // STOCK SUFICIENTE
+  //     const IdProductCarro = IdProduct;
 
-      // PREGUNTO SI EXISTE UN CARRITO PARA EL USUARIO
-      if (Cart) {
-        // PARA AGREGAR O MODIFICAR ARTICULOS EN EL CARRITO EXISTENTE DE UN USUARIO
-        const cid = Cart._id;
-        const CC = Cart.DetalleCarro.find((elemento) => {
-          return elemento.eid._id == eid;
-          // console.log(elemento.eid._id == eid);
-        });
+  //     // PREGUNTO SI EXISTE UN CARRITO PARA EL USUARIO
+  //     if (Cart) {
+  //       // PARA AGREGAR O MODIFICAR ARTICULOS EN EL CARRITO EXISTENTE DE UN USUARIO
+  //       const cid = Cart._id;
+  //       const CC = Cart.DetalleCarro.find((elemento) => {
+  //         return elemento.eid._id == eid;
+  //         // console.log(elemento.eid._id == eid);
+  //       });
 
-        //BUSCO SI YA EXISTE EL ARTICULO EN EL CARRITO
-        if (CC != undefined) {
-          //MODIFICA LA CANTIDAD DEL ARTICULO EXISTENTE EN EL CARRITO
+  //       //BUSCO SI YA EXISTE EL ARTICULO EN EL CARRITO
+  //       if (CC != undefined) {
+  //         //MODIFICA LA CANTIDAD DEL ARTICULO EXISTENTE EN EL CARRITO
 
-          const modific = await Shoppings.updateOne(
-            { _id: cid, "DetalleCarro._id": CC._id },
-            { $set: { "DetalleCarro.$.cantidad": cantidad } },
-            { arrayFilters: [{ "DetalleCarro.pid": pid }] }
-          );
+  //         const modific = await Shoppings.updateOne(
+  //           { _id: cid, "DetalleCarro._id": CC._id },
+  //           { $set: { "DetalleCarro.$.cantidad": cantidad } },
+  //           { arrayFilters: [{ "DetalleCarro.pid": pid }] }
+  //         );
 
-          res
-            .status(200)
-            .send({ status: "ok", data: await Shoppings.findById(cid) });
-        } else {
-          //NO EXISTE EL ARTICULO - AGREGA EL ARTICULO EN EL CARRITO
+  //         res
+  //           .status(200)
+  //           .send({ status: "ok", data: await Shoppings.findById(cid) });
+  //       } else {
+  //         //NO EXISTE EL ARTICULO - AGREGA EL ARTICULO EN EL CARRITO
 
-          const modific = await Shoppings.updateOne(
-            { _id: cid },
-            {
-              $push: {
-                DetalleCarro: {
-                  pid,
-                  eid,
-                  IdProductCarro,
-                  IdArtCarro,
-                  cantidad,
-                },
-              },
-            }
-          );
+  //         const modific = await Shoppings.updateOne(
+  //           { _id: cid },
+  //           {
+  //             $push: {
+  //               DetalleCarro: {
+  //                 pid,
+  //                 eid,
+  //                 IdProductCarro,
+  //                 IdArtCarro,
+  //                 cantidad,
+  //               },
+  //             },
+  //           }
+  //         );
 
-          res
-            .status(200)
-            .send({ status: "ok", data: await Shoppings.findById(cid) });
-        }
-      } else {
-        // CREA EL CARRITO PONIENDO EL PRIMER ARTICULO SELECCIONADO
+  //         res
+  //           .status(200)
+  //           .send({ status: "ok", data: await Shoppings.findById(cid) });
+  //       }
+  //     } else {
+  //       // CREA EL CARRITO PONIENDO EL PRIMER ARTICULO SELECCIONADO
 
-        const modific = await Shoppings.create({ IdUsu });
-        modific.DetalleCarro.push({
-          pid,
-          eid,
-          IdProductCarro,
-          IdArtCarro,
-          cantidad,
-        });
+  //       const modific = await Shoppings.create({ IdUsu });
+  //       modific.DetalleCarro.push({
+  //         pid,
+  //         eid,
+  //         IdProductCarro,
+  //         IdArtCarro,
+  //         cantidad,
+  //       });
 
-        await modific.save();
+  //       await modific.save();
 
-        return res.status(200).send({ status: "ok", data: modific });
-      }
-    } else {
-      res
-        .status(500)
-        .send({ status: "err", data: "Cantidad Superior a la Existencia" });
-    }
-  } catch (err) {
-    res.status(500).send({ status: "ERR", data: err });
-  }
+  //       return res.status(200).send({ status: "ok", data: modific });
+  //     }
+  //   } else {
+  //     res
+  //       .status(500)
+  //       .send({ status: "err", data: "Cantidad Superior a la Existencia" });
+  //   }
+  // } catch (err) {
+  //   res.status(500).send({ status: "ERR", data: err });
+  // }
 }
 
 // PARA AGREGAR ARTICULOS AL CARRITO EXISTENTE DE UN USUARIO (SIN USAR)
