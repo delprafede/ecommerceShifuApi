@@ -5,62 +5,8 @@ import SchemaProduct from "../models/ProductModel.js";
 import Especificaciones from "../models/EspecificacionesModel.js";
 import SchemaShoppings from "../models/shopping.models.js";
 
-// async function GetProductShoping(req, res) {
-//   try {
-//     const {id} = req.params;
-//     // const Cart = await Shoppings.findById(id);
-//     const Cart = await Shoppings.find();
-
-//     let Band = "Su Carrito Actualizado"
-//     if (Cart) {
-//       const cid=Cart._id
-
-//       const BackCart = Cart.DetalleCarro
-//       console.log(BackCart);
-//       // let Total=Cart.TotalCarro;
-//       for (let i = 0; i < BackCart.length; i++) {//B
-//         const element = BackCart[i];
-//         console.log(element);
-//         const Product = await SchemaProduct.findOne({_id:element.pid});
-//         const Especi = await Especificaciones.findById(element.eid);
-//         if (Especi.Stock < element.CantProduct) {
-//           Band = "Se Actualizaron Productos en el Carrito por Falta de Stock"
-//           element.CantProduct = Especi.Stock
-//         }
-//       }
-//       Cart.DetalleCarro = BackCart.filter(element => element.CantProduct != 0)
-
-//       const modifica= await Shoppings.updateOne(
-//         {  _id: id },
-//         {DetalleCarro: Cart.DetalleCarro },
-//         )
-
-//       res.status(200).json({ status: "OK", data: Band, Cart });
-
-//     } else {
-//       res
-//         .status(500)
-//         .send({ status: "ERR", data: "CUIDADO No Existe Carrito para este Usuario" });
-
-//     }
-
-//   } catch (err) {
-//     res.status(500).send({ status: "ERR", data: err.message });
-//   }
-// }
-// export const GetProductShoping = async (req, res) => {
-//   try {
-//     const ShoppingSave = await SchemaShoppings.find({ IdUsu: req.user.id });
-//     res.status(200).json(ShoppingSave);
-//     // console.log(ShoppingSave);
-//   } catch (error) {
-//     res.status(400).json(error);
-//     console.log(error);
-//   }
-// };
 
 //BUSCA SI EXISTE CARRITO DEL USUARIO Y LO LISTA- (FUNCIONANDO)
-
 async function GetShopingByIdUsu(req, res) {
   try {
     const Cart = await SchemaShoppings.findOne({ IdUsu: req.user.id });
@@ -83,7 +29,7 @@ async function GetShopingByIdUsu(req, res) {
 //CREA - AGREGA PRODUCTOS - MODIFICA LA CANTIDAD DE UN PRODUCTO EN UN CARRITO PARA UN USUARIO (FUNCIONANDO)
 async function PostProduct(req, res) {
   const { IdProduct, IdUsu, cantidad, color, eid } = req.body;
-  console.log(req.body, "soy");
+  console.log(req.body);
 
  
   try {
@@ -170,60 +116,7 @@ async function PostProduct(req, res) {
   }
 }
 
-// PARA AGREGAR ARTICULOS AL CARRITO EXISTENTE DE UN USUARIO (SIN USAR)
-async function PushProduct(req, res) {
-  //   try {
-  //       const {CantProduct, IdProduct, IdUsu} = req.body;
-  //           const Product = await Products.findOne({IdProduct:IdProduct });
-  //           const pid = Product._id;
-  //           const IdProductCarro = Product.IdProduct;
-  //           if (Product.Stock > CantProduct) {
-  //             const ParcialProduct = Product.Precio * CantProduct;
-  //             const Cart = await Shoppings.findOne({IdUsu:IdUsu});
-  //             const cid = Cart._id;
-  //             const CC = Cart.DetalleCarro.find(elemento => {return elemento.IdProductCarro == IdProduct});
-  //             if(CC!=undefined){
-  //               let Total=Cart.TotalCarro-CC.ParcialProduct+ParcialProduct;
-  //               const modific= await Shoppings.updateOne(
-  //                 { _id:cid, 'DetalleCarro.pid': pid },
-  //                 { TotalCarro:Total, $set: { 'DetalleCarro.$.ParcialProduct':ParcialProduct,'DetalleCarro.$.CantProduct':CantProduct} },
-  //                 { arrayFilters: [{ 'DetalleCarro.pid': pid }] }
-  //               );
-  //               res.status(200).send({status:'ok', data: "Se Modifico el Articulo" })
-  //             }else{
-  //               let Total=Cart.TotalCarro+ParcialProduct;
-  //               const modifica= await Shoppings.updateOne(
-  //               { _id: cid },
-  //               { TotalCarro:Total,
-  //                 $push: { DetalleCarro: { pid, CantProduct,ParcialProduct, IdProductCarro } } }
-  //               );
-  //               res.status(200).send({status:'ok', data: "se agrego" })
-  //             }
-  //           } else {
-  //             res
-  //             .status(500)
-  //             .send({ status: "ERR", data: "Cantidad Superior a la Existencia" });
-  //           }
-  //     } catch (err) {
-  //       res.status(500).send({ status: "ERR", data: err.message });
-  //     }}
-  // //PARA ELIMINAR UN ARTICULO DE UN CARRITO EXISTENTE
-  // async function DeleteProduct(req, res) {
-  //   try {
-  //     const {pid, IdUsu} = req.body;
-  //           const Cart = await Shoppings.findOne({IdUsu:IdUsu});
-  //           const cid = Cart._id;
-  //           const CC = Cart.DetalleCarro.find(elemento => {return elemento.pid == pid});
-  //           let Total=Cart.TotalCarro-CC.ParcialProduct;
-  //           const modifica= await Shoppings.updateOne(
-  //             { _id: cid , "DetalleCarro.pid":pid},
-  //             { TotalCarro:Total, $pull: { DetalleCarro: { pid} }},
-  //             { arrayFilters: [{ 'DetalleCarro.pid': pid }] })
-  //             res.status(200).send({status:'ok', data: "Se Elmino el Articulo del Carrito" })
-  //   } catch (err) {
-  //     res.status(500).send({ status: "ERR", data: err.message });
-  //   }
-}
+
 
 //PARA ELIMINAR UN ARTICULO DE UN CARRITO EXISTENTE (FUNCIONANDO)
 async function DeleteProduct(req, res) {
@@ -256,20 +149,9 @@ async function DeleteProduct(req, res) {
   }
 }
 
-//PARA ELIMINAR UN CARRITO EXISTENTE
-// async function DeleteShopping(req, res) {
-//   try {
-//     const { user } = req.body;
-//     const dele = await Shoppings.findByIdAndDelete(user);
-//     // console.log(dele);
-//     res.status(200).send({ status: "ok", data: "Se Elmino el Carrito", dele });
-//   } catch (err) {
-//     // console.log("estoy aaca");
-//     res.status(500).send({ status: "ERR", data: err.message });
-//   }
-// }
 
-//PARA CONFIRMAR EL CARRITO EXISTENTE
+
+//PARA CONFIRMAR EL CARRITO EXISTENTE (pago)
 async function ConfirmaShopping(req, res) {
   try {
     console.log(req.body, "SOY YO el confirma shopping");
@@ -347,35 +229,7 @@ async function ConfirmaShopping(req, res) {
   }
 }
 
-// Endpoint para Crear productos (NO USAR BORRAR AL FINALIZAR EL PROYECTO)
-// async function CreateProducts(req, res) {
-//   try {
-//     const {
-//       IdProduct,
-//       NombreProducto,
-//       Precio,
-//       Detalle,
-//       UltimoPrecio,
-//       Categoria,
-//     } = req.body;
 
-//     const NewProduct = await SchemaProduct.create({
-//       IdProduct,
-//       NombreProducto,
-//       Precio,
-//       Detalle,
-//       UltimoPrecio,
-//       Categoria,
-//       Especificaciones: [],
-//     });
-
-//     if (NewProduct) {
-//       res.status(200).send({ status: "OK", data: NewProduct });
-//     }
-//   } catch (err) {
-//     res.status(500).send({ status: "ERR", data: err.message });
-//   }
-// }
 
 // Endpoint para Crear Especificaciones
 async function Create(req, res) {
@@ -438,11 +292,8 @@ async function GetProductss(req, res) {
 
 export {
   PostProduct,
-  PushProduct,
   DeleteProduct,
   ConfirmaShopping,
-  // CreateProducts,
-  // CreateEspecificacioness,
   GetCompleteProduct,
   GetProductss,
   GetShopingByIdUsu,

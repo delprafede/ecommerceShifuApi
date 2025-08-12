@@ -2,13 +2,12 @@ import { Router } from "express";
 import {
   // GetProductShoping,
   PostProduct,
-  PushProduct,
+  // PushProduct,
   DeleteProduct,
   ConfirmaShopping,
-  // CreateProducts,
-  // CreateEspecificacioness,
+ 
   GetCompleteProduct,
-  // GetProducts,
+
   GetShopingByIdUsu,
 } from "../controllers/ShoppingController.js";
 import { createOrder } from "../controllers/pago.controllers.js";
@@ -25,7 +24,7 @@ router.post("/carrito", PostProduct);
 
 // router.post("/IdUsu", GetShopingByIdUsu);
 
-router.patch("/", PushProduct);
+// router.patch("/", PushProduct);
 
 router.delete("/carrito", DeleteProduct);
 
