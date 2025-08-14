@@ -6,7 +6,7 @@ import fs from "fs-extra";
 
 // Endpoint para crear todos los productos (FUNCIONANDO)
 async function CreateProducts(req, res) {
-  console.log(req.body);
+ 
   try {
     const {
       IdProduct,
@@ -27,9 +27,9 @@ async function CreateProducts(req, res) {
       Especificaciones: [],
     });
     if (req.files?.UrlImagen) {
-      console.log(req.files.UrlImagen);
+      
       const result = await uploadImage(req.files.UrlImagen.tempFilePath);
-      // console.log(result);
+     
       NewProduct.UrlImagen = {
         secure_url: result.secure_url,
         public_id: result.public_id,
@@ -38,7 +38,7 @@ async function CreateProducts(req, res) {
       // }
     }
     await NewProduct.save();
-    // console.log(req.files);
+  
     res.status(200).send({ status: " Ok, subiendo producto" });
   } catch (err) {
     res.status(500).send({ status: "ERR", data: err.message });
@@ -48,13 +48,15 @@ async function CreateProducts(req, res) {
 
 async function AddImagesProduct(req, res) {
   try {
-    // const { id } = req.params;
+    
     const { _id } = req.body;
-    console.log(req.body._id);
+    // console.log(_id)
+    // console.log(req.files, "soy el file");
 
     const Product = await SchemaProduct.findById(_id);
+    console.log(Product)
     if (req.files?.UrlImagen) {
-      console.log(req.files.UrlImagen);
+      
       const result = await uploadImage(req.files.UrlImagen.tempFilePath);
       Product.UrlImagen.push({
         secure_url: result.secure_url,

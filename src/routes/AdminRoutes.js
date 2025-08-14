@@ -32,6 +32,7 @@ router.put("/Admin/Product", UpdateProduct);
 router.put("/Admin/Picture", [upload], UpdatePicture);
 router.delete("/Admin/Product/:id", DeleteProduct);
 router.delete("/Admin/Especificaciones", DeleteEspecificaciones);
+
 router.delete("/Admin/Picture", DeleteImage);
 
 export default router;
