@@ -66,8 +66,10 @@ export const login = async (req, res) => {
     //token
     const token = await createAccesToken({ id: userFound._id });
     res.cookie("token", token, {
-      // sameSite: "none",
-      // secure: true,
+      sameSite: "none",
+      secure: true,
+      // expires: new Date(Date.now() + 3600000), // 1 hour
+      
     });
 
     //(dto)

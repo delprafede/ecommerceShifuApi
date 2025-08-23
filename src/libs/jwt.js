@@ -9,7 +9,7 @@
             payload,  //payload
             tokenSecret, //secret
             { 
-                expiresIn: '8h'   //obsiones
+                expiresIn: '12h'
             },  
             (err, token) => {
                 if (err) reject(err) 
