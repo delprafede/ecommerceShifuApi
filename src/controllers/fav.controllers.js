@@ -36,14 +36,15 @@ export const getFavorites = async (req, res) => {
     res.status(200).json(fav);
     // console.log(fav);
   } catch (error) {
-    res.status(400).json(error);
-   
+    // res.status(400).json(error);
+    res.status(500).json({ message: error.message });
+    console.log(error);
   }
 };
 
 //Borrar el producto de favoritos
 export const deleteFavorite = async (req, res) => {
-  // console.log(req.params.id);
+  console.log(req.params.id);
   try {
     const deleteFavorite = await Fav.findOneAndDelete({product:req.params.id});
     if (!deleteFavorite)
