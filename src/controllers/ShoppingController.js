@@ -29,7 +29,7 @@ async function GetShopingByIdUsu(req, res) {
 //CREA - AGREGA PRODUCTOS - MODIFICA LA CANTIDAD DE UN PRODUCTO EN UN CARRITO PARA UN USUARIO (FUNCIONANDO)
 async function PostProduct(req, res) {
   const { IdProduct, IdUsu, cantidad, color, eid } = req.body;
-  console.log(req.body);
+  // console.log(req.body,);
 
  
   try {
