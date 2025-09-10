@@ -120,7 +120,7 @@ async function PostProduct(req, res) {
 
 //PARA ELIMINAR UN ARTICULO DE UN CARRITO EXISTENTE (FUNCIONANDO)
 async function DeleteProduct(req, res) {
-  console.log(req.body, "SOY YO ELIMINADO DESDE EL CARRITO");
+ 
   try {
     const Product = { IdUsu: req.body.IdUsu, eid: req.body.eid };
 
