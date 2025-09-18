@@ -9,10 +9,14 @@ const Especificaciones = new mongoose.Schema({
   CodColor: "String",
   Talle: "String",
   Stock: "Number",
-  Fecha: "date",
   CodProducto: "String",
   _IdProduct: { type: "String" },
   Estado: { type: "String", enum: ["Alta", "Baja"], default: "Alta" },
-});
+  
+},
+  {
+    timestamps: true,
+  }
+);
 
 export default mongoose.model(collection, Especificaciones);

@@ -60,7 +60,7 @@ export const deleteFavorite = async (req, res) => {
   }
 };
 
-// Pagina de del producto
+// Pagina del producto
 export const productCard = async (req, res) => {
   try {
     const fav = await Fav.findById(req.params.id).populate("user");

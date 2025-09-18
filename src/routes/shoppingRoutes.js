@@ -1,36 +1,34 @@
 import { Router } from "express";
 import {
   // GetProductShoping,
-  PostProduct,
+  createProductShopinng,
   // PushProduct,
-  DeleteProduct,
+  // DeleteProduct,
+  deleteProductShopping,
   ConfirmaShopping,
- 
   GetCompleteProduct,
-
   GetShopingByIdUsu,
 } from "../controllers/ShoppingController.js";
 import { createOrder } from "../controllers/pago.controllers.js";
-import { deleteShopping } from "../controllers/products.controllers.js";
+
 import { authRequired } from "../middelwares/validateToken.js";
 
 const router = Router();
 
-
 // RUTA QUE LLEVA AL FRONT LOS PRODUCTOS DEL CARRITO
-router.get("/carritos",authRequired, GetShopingByIdUsu);
+router.get("/carritos", authRequired, GetShopingByIdUsu);
 
-router.post("/carrito", PostProduct);
+router.post("/carrito", createProductShopinng);
 
 // router.post("/IdUsu", GetShopingByIdUsu);
 
 // router.patch("/", PushProduct);
 
-router.delete("/carrito", DeleteProduct);
+// router.delete("/carrito", DeleteProduct);
 
-router.delete("/elimina/:id", deleteShopping);
+router.delete("/elimina", deleteProductShopping);
 
-router.post("/carrito/confirma", ConfirmaShopping ); // segunda opcion para los pagos del product
+router.post("/carrito/confirma", ConfirmaShopping); // segunda opcion para los pagos del product
 
 // router.post("/Admin", CreateProducts);
 

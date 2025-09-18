@@ -6,7 +6,6 @@ import fs from "fs-extra";
 
 // Endpoint para crear todos los productos (FUNCIONANDO)
 async function CreateProducts(req, res) {
- 
   try {
     const {
       IdProduct,
@@ -27,9 +26,8 @@ async function CreateProducts(req, res) {
       Especificaciones: [],
     });
     if (req.files?.UrlImagen) {
-      
       const result = await uploadImage(req.files.UrlImagen.tempFilePath);
-     
+
       NewProduct.UrlImagen = {
         secure_url: result.secure_url,
         public_id: result.public_id,
@@ -38,7 +36,7 @@ async function CreateProducts(req, res) {
       // }
     }
     await NewProduct.save();
-  
+
     res.status(200).send({ status: " Ok, subiendo producto" });
   } catch (err) {
     res.status(500).send({ status: "ERR", data: err.message });
@@ -48,15 +46,10 @@ async function CreateProducts(req, res) {
 
 async function AddImagesProduct(req, res) {
   try {
-    
     const { _id } = req.body;
-    // console.log(_id)
-    // console.log(req.files, "soy el file");
 
     const Product = await SchemaProduct.findById(_id);
-    console.log(Product)
     if (req.files?.UrlImagen) {
-      
       const result = await uploadImage(req.files.UrlImagen.tempFilePath);
       Product.UrlImagen.push({
         secure_url: result.secure_url,
@@ -155,54 +148,99 @@ async function GetCompleteProduct(req, res) {
 
 // Endpoint para Crear Especificaciones
 async function CreateEspecificaciones(req, res) {
-  // console.log(req);
+  const { data } = req.body;
+  console.log(data);
+
+  // try {
+  //   const Especific = await Especificaciones.findOne({
+  //     Color: data.Color,
+  //     Talle: data.Talle,
+  //     _IdProduct: data._IdProduct,
+  //   });
+  //   //Producto encontrado
+  //   console.log(Especific, "especifi");
+  //     if (Especific !== null) {
+  //   //Modifica solo el stock si encuantra el producto con el color y talle similar
+  //   const UpdateEspecification = await Especificaciones.findByIdAndUpdate(
+  //     Especific._id,
+  //     {
+  //       Stock: data.Stock,
+  //     },
+  //     { new: true }
+  //   );
+  //   console.log(UpdateEspecification, "null");
+
+  //     res.status(200).send({
+  //       status: "OK",
+  //       data: UpdateEspecification,
+  //       message: "Especificaciones modificadas",
+  //     });
+  //   } else {
+  //     const NewEspecification = await Especificaciones.create( data );
+  //       await SchemaProduct.updateOne(
+  //       { _id: data._IdProduct },
+  //       { $push: { Especificaciones: { id: Especific._id } } }
+  //     );
+  //     res.status(200).send({
+  //       status: "OK",
+  //       data: NewEspecification,
+  //       message: "Especificaciones creadas",
+  //     });
+  //     console.log(NewEspecification, "2");
+  //   }
+
+  //   // res.status(200).send({ status: "OK", data: NewProductUpdate });
+  //   // }
+  //   //  else {
+  //   //   const NewEspecification = await Especificaciones.create(data);
+  //   //   console.log(NewEspecification);
+  //   // }
+  // } catch (err) {
+  //   res.status(500).send({ status: "ERR", data: err.message });
+  // }
   try {
-    const E = {
-      Color: req.body.Color,
-      CodColor: req.body.CodColor,
-      Talle: req.body.Talle,
-      Stock: req.body.Stock,
-      Fecha: req.body.Fecha,
-      CodProducto: req.body.CodProducto,
-      _IdProduct: req.body._IdProduct,
-    };
-    console.log(E);
-    const Color = E.Color;
-    const CodColor = E.CodColor;
-    const Talle = E.Talle;
-    const Stock = E.Stock;
-    const Fecha = E.Fecha;
-    const CodProducto = E.CodProducto;
-    const _IdProduct = E._IdProduct;
-
-    const NewProduct = await Especificaciones.create({
-      Color,
-      CodColor,
-      Talle,
-      Stock,
-      Fecha,
-      CodProducto,
-      _IdProduct,
-    });
-
+    //Entra al modelo y lo busca
     const Especific = await Especificaciones.findOne({
-      Color: Color,
-      Talle: Talle,
-      _IdProduct: _IdProduct,
+      Color: data.Color,
+      Talle: data.Talle,
+      _IdProduct: data._IdProduct,
     });
-
-    await SchemaProduct.updateOne(
-      { _id: _IdProduct },
-      { $push: { Especificaciones: { id: Especific._id } } }
-    );
-
-    if (NewProduct) {
-      res.status(200).send({ status: "OK", data: NewProduct });
+    console.log(Especific, "especifi");
+    if (Especific === null) {
+      // Crear especificaciones en el modelo de Especificaciones
+      const NewProduct = await Especificaciones.create(data);
+      console.log(NewProduct, "nuevo producto");
+      //cuando lo encuentra lo pushea al array de especificaciones del producto
+      await SchemaProduct.updateOne(
+        { _id: NewProduct._IdProduct },
+        { $push: { Especificaciones: { id: NewProduct._id } } }
+      );
+      res
+        .status(200)
+        .send({
+          status: "OK",
+          data: NewProduct,
+          message: "Especificaciones creadas",
+        });
+    } else {
+      //   //Modifica solo el stock si encuantra el producto con los colores y talles iguales
+      const UpdateEspecification = await Especificaciones.findByIdAndUpdate(
+        Especific._id,
+        {
+          Stock: data.Stock,
+        },
+        { new: true }
+      );
+      res.status(200).send({
+        status: "OK",
+        data: UpdateEspecification,
+        message: "Especificaciones modificadas",
+      });
+      console.log(UpdateEspecification, "modificado");
     }
   } catch (err) {
     res.status(500).send({ status: "ERR", data: err.message });
   }
-  // res.status(200).send({ status: "OK", mesg: "entrando" });
 }
 
 // Endpoint para Modificar Especificaciones

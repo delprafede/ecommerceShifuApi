@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { productCard,GetProducts, GetEspecificaiones,GetEspecificaciones} from "../controllers/products.controllers.js";
+import { productCard,GetProducts, GetEspecificaiones,GetEspecificacionesT} from "../controllers/products.controllers.js";
 
 const router = Router();
 
@@ -9,7 +9,7 @@ router.get('/productCard/:id',productCard);
 
 router.post('/productCardE',GetEspecificaiones);
 
-router.post('/productCardT',GetEspecificaciones);
+router.post('/productCardT',GetEspecificacionesT);
 
 
 export default  router;

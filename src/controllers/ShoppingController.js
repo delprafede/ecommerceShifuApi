@@ -5,7 +5,6 @@ import SchemaProduct from "../models/ProductModel.js";
 import Especificaciones from "../models/EspecificacionesModel.js";
 import SchemaShoppings from "../models/shopping.models.js";
 
-
 //BUSCA SI EXISTE CARRITO DEL USUARIO Y LO LISTA- (FUNCIONANDO)
 async function GetShopingByIdUsu(req, res) {
   try {
@@ -14,7 +13,7 @@ async function GetShopingByIdUsu(req, res) {
     if (Cart) {
       res.status(200).json(Cart);
       // res.status(200).json({ status: "OK", data: Cart });
-    } 
+    }
     // else {
     //   res.status(400).send({
     //     status: "ERR",
@@ -25,22 +24,25 @@ async function GetShopingByIdUsu(req, res) {
     res.status(400).send({ status: "ERR", data: err.message });
   }
 }
-
 //CREA - AGREGA PRODUCTOS - MODIFICA LA CANTIDAD DE UN PRODUCTO EN UN CARRITO PARA UN USUARIO (FUNCIONANDO)
-async function PostProduct(req, res) {
+export const createProductShopinng = async(req, res) => {
   const { IdProduct, IdUsu, cantidad, color, eid } = req.body;
-  // console.log(req.body,);
+  console.log(req.body, "soy el body");
 
  
   try {
     const Cart = await Shoppings.findOne({ IdUsu: IdUsu });
+    console.log(Cart, "soy el detalle carro del usuario")
 
     const Product = await SchemaProduct.findOne({ IdProduct: IdProduct });
-
+console.log(Product, "soy el producto")
     const Especi = await Especificaciones.findById(eid);
+    console.log(Especi, "soy la especificacion")
     const pid = Product._id;
+    console.log(pid, "soy el pid")
     const IdArtCarro = Especi.CodArt;
-    // console.log(Especi);
+    console.log(IdArtCarro, "soy el IdArtCarro")
+  
     // CONSULTO SI EL STOCK ES SUFICIENTE PARA LA CANTIDAD INGRESADA
     if (Especi.Stock >= cantidad) {
       // STOCK SUFICIENTE
@@ -52,13 +54,13 @@ async function PostProduct(req, res) {
         const cid = Cart._id;
         const CC = Cart.DetalleCarro.find((elemento) => {
           return elemento.eid._id == eid;
-          // console.log(elemento.eid._id == eid);
+      
         });
 
         //BUSCO SI YA EXISTE EL ARTICULO EN EL CARRITO
-        if (CC != undefined) {
+        if (CC !== undefined) {
           //MODIFICA LA CANTIDAD DEL ARTICULO EXISTENTE EN EL CARRITO
-
+          console.log(CC, "soy el CC")
           const modific = await Shoppings.updateOne(
             { _id: cid, "DetalleCarro._id": CC._id },
             { $set: { "DetalleCarro.$.cantidad": cantidad } },
@@ -71,7 +73,7 @@ async function PostProduct(req, res) {
         } else {
           //NO EXISTE EL ARTICULO - AGREGA EL ARTICULO EN EL CARRITO
 
-          const modific = await Shoppings.updateOne(
+          const createCard = await Shoppings.updateOne(
             { _id: cid },
             {
               $push: {
@@ -81,14 +83,16 @@ async function PostProduct(req, res) {
                   IdProductCarro,
                   IdArtCarro,
                   cantidad,
+                  color
                 },
               },
             }
+            
           );
-
+console.log(createCard, "soy el createCard")
           res
             .status(200)
-            .send({ status: "ok", data: await Shoppings.findById(cid) });
+            .send({ status: "ok", data: await Shoppings.findById(cid), message: "Agregando producto en el carro" });
         }
       } else {
         // CREA EL CARRITO PONIENDO EL PRIMER ARTICULO SELECCIONADO
@@ -100,11 +104,12 @@ async function PostProduct(req, res) {
           IdProductCarro,
           IdArtCarro,
           cantidad,
+          color
         });
 
         await modific.save();
 
-        return res.status(200).send({ status: "ok", data: modific });
+        return res.status(200).send({ status: "ok", data: modific, message: "creando carrito desde cero" });
       }
     } else {
       res
@@ -119,17 +124,14 @@ async function PostProduct(req, res) {
 
 
 //PARA ELIMINAR UN ARTICULO DE UN CARRITO EXISTENTE (FUNCIONANDO)
-async function DeleteProduct(req, res) {
- 
-  try {
-    const Product = { IdUsu: req.body.IdUsu, eid: req.body.eid };
+export const deleteProductShopping = async (req, res) => {
+  const { IdUsu, eid } = req.body;
 
-    const IdUsu = Product.IdUsu;
-    const eid = Product.eid;
-    console.log(Product);
-    const Cart = await Shoppings.findOne({ IdUsu: IdUsu });
+  try {
+    const Cart = await Shoppings.findOne({ IdUsu });
+   
     const cid = Cart._id;
-    console.log(cid);
+ 
     const CC = Cart.DetalleCarro.find((elemento) => {
       return elemento.eid._id == eid;
     });
@@ -139,17 +141,35 @@ async function DeleteProduct(req, res) {
       { $pull: { DetalleCarro: { eid } } },
       { arrayFilters: [{ "DetalleCarro.pid": eid }] }
     );
-    console.log(modifica);
-
-    res
-      .status(200)
-      .send({ status: "ok", data: "Se Elmino el Articulo del Carrito" });
+    if (modifica) {
+      res
+        .status(200)
+        .send({ status: "ok", data: "Se Elmino el Articulo del Carrito" });
+    }
   } catch (err) {
     res.status(500).send({ status: "ERR", data: err.message });
   }
-}
+};
+//ELIMINA EL CARRITO DEL USUARIO (FUNCIONANDO)
+// export const deleteProductShopping = async (req, res) => {
+//   console.log(req.params.id);
+//   try {
+//     const deleteShopping = await Shoppings.findOneAndDelete({
+//       product: req.params.id,
+//     });
+//     console.log(deleteShopping);
+//     // if (!deleteShopping)
+//     //   // return res
+//     //   //   .status(404)
+//     //   //   .json({ message: "el producto ya no se encuentra" });
 
-
+//     return res.sendStatus(204);
+//     //todo estubo bien no te voy a devolver nada
+//     //no devuelva nada(no hay contenido)solo que se haya borrado correctamente
+//   } catch (error) {
+//     return res.status(500).json({ message: error.message });
+//   }
+// };
 
 //PARA CONFIRMAR EL CARRITO EXISTENTE (pago)
 async function ConfirmaShopping(req, res) {
@@ -229,40 +249,38 @@ async function ConfirmaShopping(req, res) {
   }
 }
 
-
-
 // Endpoint para Crear Especificaciones
-async function Create(req, res) {
-  console.log(req.body);
-  try {
-    const { Color, CodColor, Talle, Stock, Fecha, CodProducto, id } = req.body;
+// async function Create(req, res) {
+//   console.log(req.body);
+//   try {
+//     const { Color, CodColor, Talle, Stock, Fecha, CodProducto, id } = req.body;
 
-    const NewProduct = await Especificaciones.create({
-      Color,
-      CodColor,
-      Talle,
-      Stock,
-      Fecha,
-      CodProducto,
-    });
+//     const NewProduct = await Especificaciones.create({
+//       Color,
+//       CodColor,
+//       Talle,
+//       Stock,
+//       Fecha,
+//       CodProducto,
+//     });
 
-    const Especific = await Especificaciones.findOne({
-      Color: Color,
-      Talle: Talle,
-    });
+//     const Especific = await Especificaciones.findOne({
+//       Color: Color,
+//       Talle: Talle,
+//     });
 
-    await SchemaProduct.updateOne(
-      { _id: id },
-      { $push: { Especificaciones: { id: Especific._id } } }
-    );
+//     await SchemaProduct.updateOne(
+//       { _id: id },
+//       { $push: { Especificaciones: { id: Especific._id } } }
+//     );
 
-    if (NewProduct) {
-      res.status(200).send({ status: "OK", data: NewProduct });
-    }
-  } catch (err) {
-    res.status(500).send({ status: "ERR", data: err.message });
-  }
-}
+//     if (NewProduct) {
+//       res.status(200).send({ status: "OK", data: NewProduct });
+//     }
+//   } catch (err) {
+//     res.status(500).send({ status: "ERR", data: err.message });
+//   }
+// }
 
 // Endpoint para obtener producto completo
 async function GetCompleteProduct(req, res) {
@@ -277,24 +295,10 @@ async function GetCompleteProduct(req, res) {
   }
 }
 
-// // Endpoint para obtener producto completo
-async function GetProductss(req, res) {
-  //no usar este enpoint
-  const { IdProduct } = req.body;
-  try {
-    const Product = await SchemaProduct.findOne({ IdProduct: IdProduct });
 
-    res.status(200).send({ status: "OK estoy acaaaa", data: Product });
-  } catch (err) {
-    res.status(500).send({ status: "ERR", data: err.message });
-  }
-}
 
 export {
-  PostProduct,
-  DeleteProduct,
   ConfirmaShopping,
   GetCompleteProduct,
-  GetProductss,
   GetShopingByIdUsu,
 };
